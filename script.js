@@ -1,4 +1,15 @@
 const API_KEY = "API_KEY";
+let isDisplaying = false;
+let tempModes;
+let unit = "F";
+
+const input = document.querySelector("#citySearch");
+const degrees = document.querySelector("#degrees");
+const temp = document.querySelector("#temp");
+const conditions = document.querySelector("#conditions");
+const humidity = document.querySelector("#humidity");
+const visibility = document.querySelector("#visibility");
+const sunrise = document.querySelector("#sunrise");
 
 async function getWeather(city) {
     try {
@@ -10,14 +21,16 @@ async function getWeather(city) {
         const weatherData = await response.json();
         console.log(weatherData);
         
-        const date = weatherData.days;
+        const tempF = weatherData.days[0].temp.toFixed(1);
+        const tempC = ((tempF - 32) * 5 / 9).toFixed(1);
         const conditions = weatherData.currentConditions.conditions;
         const humidity = weatherData.currentConditions.humidity;
         const visibility = weatherData.currentConditions.visibility;
         const sunrise = weatherData.currentConditions.sunrise;
 
         return {
-            date,
+            tempF,
+            tempC,
             conditions,
             humidity,
             visibility,
@@ -29,21 +42,23 @@ async function getWeather(city) {
     }
 }
 
-async function printBroadcast(broadcast) {
-    let string = "";
-    /*
-    for(let i = 0; i < 7; i++){
-        let curr = broadcast.day[i];
-        string += "Day: " + (i+1) + 
-            " | Date: " + curr.datetime +
-            " | Max: " + curr.tempmax +
-            " | Min: " + curr.tempmin +
-            " | Temp: " + curr.temp + "\n";
+async function displayBroadcast(isDisplaying, broadcast) {
+    if (isDisplaying){
+        if(unit === "F")
+            temp.textContent = broadcast.tempF + "\u00B0" + " F";
+        else
+            temp.textContent = broadcast.tempC + "\u00B0" + " C";
+        conditions.textContent = broadcast.conditions;
+        humidity.textContent = broadcast.humidity;
+        visibility.textContent = broadcast.visibility;
+        sunrise.textContent = broadcast.sunrise;
+    } else {
+        temp.textContent = "-";
+        conditions.textContent = "-";
+        humidity.textContent = "-";
+        visibility.textContent = "-";
+        sunrise.textContent = "-";
     }
-    */
-    string = broadcast.date[0].temp;
-    textbox.textContent = string;
-    
 }
 
 async function isValidInput(city) {
@@ -56,9 +71,20 @@ async function isValidInput(city) {
     return response.ok;
 }
 
-const input = document.querySelector("#citySearch");
-const textbox = document.querySelector("#response");
+function toggleTemp() {
+    if(!isDisplaying)
+        return;
 
+    if(unit === "F") {
+        temp.textContent = tempModes.celsius + "\u00B0" + " F";
+        unit = "C";
+    } else {
+        temp.textContent = tempModes.fahrenheit + "\u00B0" + " C";
+        unit = "F";
+    }
+
+    degrees.textContent = unit;
+}
 
 input.addEventListener("keydown", async(event) => {
     if (event.key === "Enter") {
@@ -66,9 +92,20 @@ input.addEventListener("keydown", async(event) => {
 
         if (await isValidInput(city)) {
             const weather = await getWeather(city);
-            printBroadcast(weather);
+
+            tempModes = {
+                fahrenheit: weather.tempF,
+                celsius: weather.tempC
+            };
+            isDisplaying = true;
+
+            displayBroadcast(isDisplaying, weather);
         } else {
-            textbox.textContent = "Error, Invalid City";
+            isDisplaying = false;
+
+            displayBroadcast(isDisplaying);
         }
     };
 });
+
+degrees.addEventListener("click", toggleTemp);

@@ -5,9 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="script.js"defer></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <input type="text" id="citySearch" placeholder="Enter a city">
-    <div id="response">None</div>
+    <div class="row" id="search">
+        <div class="small box">
+            <input type="text" id="citySearch" placeholder="Search">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="big box">
+            Temperature <b id="temp">-</b>
+            <button class="corner" id="degrees">F</div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="big box">Conditions <b class="smaller" id="conditions">-</b></div>
+        <div class="big box">Humidity <b id="humidity">-</b></div>
+    </div>
+
+    <div class="row">
+        <div class="big box">Visibility <b id="visibility">-</b></div>
+        <div class="big box">Sunrise <b id="sunrise">-</b></div>
+    </div>
+    
 </body>
 </html>
